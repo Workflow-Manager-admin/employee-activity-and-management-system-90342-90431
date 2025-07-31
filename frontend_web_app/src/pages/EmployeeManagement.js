@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useUser } from "../contexts/UserContext";
 import EmployeeDetailsForm from "../components/EmployeeDetailsForm";
+import { employeeAPI } from "../services/apiService";
 
 /**
  * PUBLIC_INTERFACE
@@ -13,56 +14,27 @@ function EmployeeManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRole, setFilterRole] = useState("all");
   const [filterDepartment, setFilterDepartment] = useState("all");
-  const [employees, setEmployees] = useState([
-    {
-      empNo: "EMP001",
-      name: "John Smith",
-      email: "john.smith@company.com",
-      department: "Engineering",
-      designation: "Software Engineer",
-      role: "Employee",
-      manager: "Jane Doe",
-      location: "Bangalore",
-      joiningDate: "2023-01-15",
-      status: "Active"
-    },
-    {
-      empNo: "EMP002", 
-      name: "Jane Doe",
-      email: "jane.doe@company.com",
-      department: "Engineering",
-      designation: "Manager",
-      role: "Manager",
-      manager: "Admin User",
-      location: "Mumbai",
-      joiningDate: "2022-08-10",
-      status: "Active"
-    },
-    {
-      empNo: "EMP003",
-      name: "Alice Johnson",
-      email: "alice.johnson@company.com",
-      department: "HR",
-      designation: "HR Executive",
-      role: "Employee",
-      manager: "Jane Doe",
-      location: "Delhi",
-      joiningDate: "2023-03-20",
-      status: "Active"
-    },
-    {
-      empNo: "EMP004",
-      name: "Bob Wilson",
-      email: "bob.wilson@company.com",
-      department: "Finance",
-      designation: "Financial Analyst",
-      role: "Employee",
-      manager: "Jane Doe",
-      location: "Remote",
-      joiningDate: "2023-05-12",
-      status: "Inactive"
+  const [employees, setEmployees] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load employees on component mount
+  useEffect(() => {
+    if (user && (user.role === "admin" || user.role === "Administrator")) {
+      loadEmployees();
     }
-  ]);
+  }, [user]);
+
+  async function loadEmployees() {
+    try {
+      setIsLoading(true);
+      const employeeData = await employeeAPI.getEmployees();
+      setEmployees(employeeData);
+    } catch (error) {
+      console.error('Error loading employees:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   if (!user || (user.role !== "admin" && user.role !== "Administrator")) {
     return (
@@ -85,34 +57,57 @@ function EmployeeManagement() {
     );
   }
 
-  function handleAddEmployee(employeeData) {
-    const newEmployee = {
-      ...employeeData,
-      status: "Active"
-    };
-    setEmployees([...employees, newEmployee]);
-    setShowAddForm(false);
-  }
-
-  function handleEditEmployee(employeeData) {
-    setEmployees(employees.map(emp => 
-      emp.empNo === employeeData.empNo ? employeeData : emp
-    ));
-    setEditingEmployee(null);
-  }
-
-  function handleDeleteEmployee(empNo) {
-    if (window.confirm("Are you sure you want to delete this employee? This action cannot be undone.")) {
-      setEmployees(employees.filter(emp => emp.empNo !== empNo));
+  async function handleAddEmployee(employeeData) {
+    try {
+      await employeeAPI.createEmployee(employeeData);
+      setShowAddForm(false);
+      await loadEmployees(); // Refresh the list
+      alert('Employee added successfully!');
+    } catch (error) {
+      console.error('Error adding employee:', error);
+      alert('Failed to add employee. Please try again.');
     }
   }
 
-  function toggleEmployeeStatus(empNo) {
-    setEmployees(employees.map(emp => 
-      emp.empNo === empNo 
-        ? { ...emp, status: emp.status === "Active" ? "Inactive" : "Active" }
-        : emp
-    ));
+  async function handleEditEmployee(employeeData) {
+    try {
+      await employeeAPI.updateEmployee(employeeData.id || employeeData.empNo, employeeData);
+      setEditingEmployee(null);
+      await loadEmployees(); // Refresh the list
+      alert('Employee updated successfully!');
+    } catch (error) {
+      console.error('Error updating employee:', error);
+      alert('Failed to update employee. Please try again.');
+    }
+  }
+
+  async function handleDeleteEmployee(empNo) {
+    if (window.confirm("Are you sure you want to delete this employee? This action cannot be undone.")) {
+      try {
+        const employee = employees.find(emp => emp.empNo === empNo);
+        await employeeAPI.deleteEmployee(employee.id || empNo);
+        await loadEmployees(); // Refresh the list
+        alert('Employee deleted successfully!');
+      } catch (error) {
+        console.error('Error deleting employee:', error);
+        alert('Failed to delete employee. Please try again.');
+      }
+    }
+  }
+
+  async function toggleEmployeeStatus(empNo) {
+    try {
+      const employee = employees.find(emp => emp.empNo === empNo);
+      const updatedEmployee = {
+        ...employee,
+        status: employee.status === "Active" ? "Inactive" : "Active"
+      };
+      await employeeAPI.updateEmployee(employee.id || empNo, updatedEmployee);
+      await loadEmployees(); // Refresh the list
+    } catch (error) {
+      console.error('Error updating employee status:', error);
+      alert('Failed to update employee status. Please try again.');
+    }
   }
 
   // Filter employees based on search and filters
@@ -337,7 +332,15 @@ function EmployeeManagement() {
               </tr>
             </thead>
             <tbody>
-              {filteredEmployees.map((employee) => (
+              {isLoading ? (
+                <tr>
+                  <td colSpan="9" style={{ textAlign: "center", padding: "40px" }}>
+                    <div className="loading-spinner"></div>
+                    <div style={{ marginTop: "10px" }}>Loading employees...</div>
+                  </td>
+                </tr>
+              ) : filteredEmployees.length > 0 ? (
+                filteredEmployees.map((employee) => (
                 <tr key={employee.empNo}>
                   <td>
                     <div>
@@ -424,7 +427,16 @@ function EmployeeManagement() {
                     </div>
                   </td>
                 </tr>
-              ))}
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="9" style={{ textAlign: "center", padding: "40px" }}>
+                    <div style={{ fontSize: "3rem", marginBottom: "16px" }}>👥</div>
+                    <h3>No employees found</h3>
+                    <p>Try adjusting your search criteria or add your first employee.</p>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

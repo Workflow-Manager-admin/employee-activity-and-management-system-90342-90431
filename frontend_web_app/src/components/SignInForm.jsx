@@ -13,20 +13,27 @@ function SignInForm() {
   const { login } = useUser();
   const navigate = useNavigate();
 
-  function doLogin(e) {
+  async function doLogin(e) {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate loading delay for better UX
-    setTimeout(() => {
-      login({
-        name: form.email.split("@")[0] || "Demo User",
+    try {
+      // Simulate loading delay for better UX
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      await login({
         email: form.email,
+        password: form.password,
         role: form.role
       });
+      
       navigate("/");
+    } catch (error) {
+      console.error('Login failed:', error);
+      alert('Login failed. Please try again.');
+    } finally {
       setIsLoading(false);
-    }, 800);
+    }
   }
 
   const roleOptions = [

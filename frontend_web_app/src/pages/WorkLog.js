@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useUser } from "../contexts/UserContext";
+import { workLogAPI } from "../services/apiService";
 
 /**
  * PUBLIC_INTERFACE
@@ -17,6 +18,45 @@ function WorkLog() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [workLogs, setWorkLogs] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load work logs on component mount
+  useEffect(() => {
+    if (user) {
+      loadWorkLogs();
+    }
+  }, [user]);
+
+  async function loadWorkLogs() {
+    try {
+      setIsLoading(true);
+      const logs = await workLogAPI.getLogs();
+      setWorkLogs(logs);
+    } catch (error) {
+      console.error('Error loading work logs:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  function handleEditLog(entry) {
+    // Populate form with log data for editing
+    setLog({
+      description: entry.description,
+      hours: entry.hours.toString(),
+      status: entry.status,
+      attachment: null, // File attachments can't be pre-filled
+      project: entry.project,
+      category: entry.category
+    });
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function handleViewLog(entry) {
+    alert(`Log Details:\n\nProject: ${entry.project}\nCategory: ${entry.category}\nHours: ${entry.hours}\nStatus: ${entry.status}\nDescription: ${entry.description}\nDate: ${new Date(entry.date || entry.created_at).toLocaleDateString()}`);
+  }
 
   if (!user) {
     return (
@@ -27,12 +67,14 @@ function WorkLog() {
     );
   }
 
-  function submitLog(e) {
+  async function submitLog(e) {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      // Submit to backend API
+      await workLogAPI.submitLog(log);
+      
       setSubmitSuccess(true);
       setLog({ 
         ...log, 
@@ -41,11 +83,18 @@ function WorkLog() {
         project: "",
         attachment: null 
       });
-      setIsSubmitting(false);
+      
+      // Refresh logs after submission
+      await loadWorkLogs();
       
       // Hide success message after 3 seconds
       setTimeout(() => setSubmitSuccess(false), 3000);
-    }, 1200);
+    } catch (error) {
+      console.error('Error submitting work log:', error);
+      alert('Failed to submit work log. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   const statusOptions = [
@@ -64,32 +113,7 @@ function WorkLog() {
     { value: "Support", icon: "🛠️" }
   ];
 
-  const mockLogs = [
-    {
-      date: "2024-06-13",
-      hours: 7,
-      project: "Project Alpha",
-      status: "Completed",
-      description: "Implemented user authentication module and wrote unit tests",
-      category: "Development"
-    },
-    {
-      date: "2024-06-12",
-      hours: 6,
-      project: "Project Beta",
-      status: "Blocked",
-      description: "Working on API integration - waiting for backend team",
-      category: "Development"
-    },
-    {
-      date: "2024-06-11",
-      hours: 8,
-      project: "Project Gamma",
-      status: "Completed",
-      description: "Sprint planning and code review session",
-      category: "Meeting"
-    }
-  ];
+  // Use real data from API instead of mock data
 
   return (
     <div>
@@ -345,55 +369,71 @@ function WorkLog() {
               </tr>
             </thead>
             <tbody>
-              {mockLogs.map((entry, index) => (
-                <tr key={index}>
-                  <td style={{ fontWeight: "600" }}>{entry.date}</td>
-                  <td style={{ fontWeight: "600", color: "var(--primary-blue)" }}>
-                    {entry.project}
-                  </td>
-                  <td>
-                    <span style={{
-                      padding: "4px 8px",
-                      borderRadius: "12px",
-                      fontSize: "0.85rem",
-                      background: "var(--light-bg)",
-                      color: "var(--text-dark)",
-                      fontWeight: "600"
-                    }}>
-                      {categoryOptions.find(c => c.value === entry.category)?.icon} {entry.category}
-                    </span>
-                  </td>
-                  <td style={{ fontWeight: "700" }}>{entry.hours}h</td>
-                  <td>
-                    <span className={`status-indicator status-${entry.status.toLowerCase().replace(' ', '-')}`}>
-                      {statusOptions.find(s => s.value === entry.status)?.icon} {entry.status}
-                    </span>
-                  </td>
-                  <td style={{ 
-                    maxWidth: "300px",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap"
-                  }}>
-                    {entry.description}
-                  </td>
-                  <td>
-                    <button 
-                      className="button-secondary button-small"
-                      style={{ marginRight: "8px" }}
-                      onClick={() => alert("Edit functionality would be implemented here")}
-                    >
-                      ✏️ Edit
-                    </button>
-                    <button 
-                      className="button-secondary button-small"
-                      onClick={() => alert("View details functionality would be implemented here")}
-                    >
-                      👁️ View
-                    </button>
+              {isLoading ? (
+                <tr>
+                  <td colSpan="7" style={{ textAlign: "center", padding: "40px" }}>
+                    <div className="loading-spinner"></div>
+                    <div style={{ marginTop: "10px" }}>Loading work logs...</div>
                   </td>
                 </tr>
-              ))}
+              ) : workLogs.length > 0 ? (
+                workLogs.map((entry, index) => (
+                  <tr key={entry.id || index}>
+                    <td style={{ fontWeight: "600" }}>{new Date(entry.date || entry.created_at).toLocaleDateString()}</td>
+                    <td style={{ fontWeight: "600", color: "var(--primary-blue)" }}>
+                      {entry.project}
+                    </td>
+                    <td>
+                      <span style={{
+                        padding: "4px 8px",
+                        borderRadius: "12px",
+                        fontSize: "0.85rem",
+                        background: "var(--light-bg)",
+                        color: "var(--text-dark)",
+                        fontWeight: "600"
+                      }}>
+                        {categoryOptions.find(c => c.value === entry.category)?.icon} {entry.category}
+                      </span>
+                    </td>
+                    <td style={{ fontWeight: "700" }}>{entry.hours}h</td>
+                    <td>
+                      <span className={`status-indicator status-${entry.status.toLowerCase().replace(' ', '-')}`}>
+                        {statusOptions.find(s => s.value === entry.status)?.icon} {entry.status}
+                      </span>
+                    </td>
+                    <td style={{ 
+                      maxWidth: "300px",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap"
+                    }}>
+                      {entry.description}
+                    </td>
+                    <td>
+                      <button 
+                        className="button-secondary button-small"
+                        style={{ marginRight: "8px" }}
+                        onClick={() => handleEditLog(entry)}
+                      >
+                        ✏️ Edit
+                      </button>
+                      <button 
+                        className="button-secondary button-small"
+                        onClick={() => handleViewLog(entry)}
+                      >
+                        👁️ View
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" style={{ textAlign: "center", padding: "40px" }}>
+                    <div style={{ fontSize: "2rem", marginBottom: "10px" }}>📝</div>
+                    <div>No work logs found. Submit your first log above!</div>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
