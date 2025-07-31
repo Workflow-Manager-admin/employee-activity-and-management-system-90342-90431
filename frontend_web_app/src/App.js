@@ -14,6 +14,7 @@ import AuditTrail from "./pages/AuditTrail";
 import Reporting from "./pages/Reporting";
 import CalendarView from "./pages/CalendarView";
 import Login from "./pages/Login";
+import SignUpPage from "./pages/SignUpPage";
 import Onboarding from "./pages/Onboarding";
 import HierarchyMgmt from "./pages/HierarchyMgmt";
 import { UserProvider, useUser } from "./contexts/UserContext";
@@ -38,6 +39,7 @@ function App() {
           <main className="app-main-area">
             <Routes>
               <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUpPage />} />
               <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/calendar" element={<CalendarView />} />
               <Route path="/*" element={<RequireAuth />} />
