@@ -11,9 +11,10 @@ function Header() {
   const { user, logout } = useUser();
   const navigate = useNavigate();
 
+  // Visually center "TATA ELXSI" (left) and "Employee Management" (right) within banner
   return (
     <header className="header-gradient">
-      <div className="header-flex-container">
+      <div className="header-align-center">
         <div className="header-logo">TATA ELXSI</div>
         <nav className="header-nav">
           {user && (

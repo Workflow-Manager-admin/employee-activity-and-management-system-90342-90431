@@ -40,13 +40,28 @@ main.app-main-area {
 .header-gradient {
   background: linear-gradient(90deg, var(--primary-blue) 0%, var(--secondary-purple) 100%);
   color: var(--text-white);
-  /* Remove space-between here, manage flex inside the container */
-  padding: 20px 40px;
+  /* Central alignment with no vertical whitespace issues */
+  padding: 0 40px;
   height: 72px;
   min-height: 72px;
   letter-spacing: 0.5px;
   font-weight: bold;
   z-index: 999;
+  display: flex;
+  align-items: center;
+}
+
+/* True central alignment for all header content */
+.header-align-center {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  gap: 32px;
+  /* Ensures all items fill the header height */
 }
 
 /* FLEX CONTAINER for three regions: logo, nav, right-title */
@@ -67,6 +82,10 @@ main.app-main-area {
   text-transform: uppercase;
   flex-shrink: 0;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 0.25em 0 0;
 }
 
 /* Navigation in the middle, will shrink if needed */
@@ -76,70 +95,85 @@ main.app-main-area {
   align-items: center;
   flex-wrap: wrap;
   flex: 1 1 auto;
-  justify-content: flex-start;
+  justify-content: center;
   min-width: 0;
   overflow-x: auto;
+  height: 100%;
+  /* centralize nav items in header height */
 }
 
-/* Right-side text: Employee Management, always right-aligned */
 .header-title-right {
   font-size: 1.25rem;
   letter-spacing: 0.25px;
   font-weight: 600;
-  margin-left: 24px;
   white-space: nowrap;
   text-align: right;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding-left: 28px;
 }
 
 /* Responsive tweaks for header */
 @media (max-width: 900px) {
   .header-gradient {
-    padding: 18px 12px;
+    padding: 0 12px;
+    min-height: 56px;
+    height: 56px;
   }
-  .header-flex-container {
-    gap: 10px;
+  .header-align-center {
+    gap: 12px;
   }
   .header-logo {
-    font-size: 1.25rem;
+    font-size: 1.15rem;
+    padding: 0 0.08em 0 0;
   }
   .header-title-right {
     font-size: 1rem;
-    margin-left: 8px;
+    padding-left: 6px;
   }
   .header-nav {
-    gap: 16px;
+    gap: 12px;
     font-size: 0.93rem;
   }
 }
 @media (max-width: 600px) {
   .header-gradient {
-    padding: 10px 5px;
-    min-height: 56px;
+    padding: 0 5px;
+    min-height: 46px;
     height: auto;
   }
-  .header-flex-container {
+  .header-align-center {
     flex-direction: column;
     align-items: stretch;
     gap: 0;
+    height: auto;
+    justify-content: flex-start;
   }
-  .header-logo, .header-title-right {
+  .header-logo,
+  .header-title-right {
     text-align: left;
     font-size: 1rem;
     margin: 2px 0;
+    height: 30px;
+    align-items: center;
+    display: flex;
+    padding: 0;
   }
   .header-title-right {
-    margin-left: 0;
+    padding-left: 0;
     text-align: left;
     font-weight: 500;
     white-space: normal;
   }
   .header-nav {
     justify-content: flex-start;
-    gap: 12px;
+    gap: 8px;
     font-size: 0.9rem;
     margin: 2px 0;
     flex-wrap: wrap;
+    min-height: 30px;
   }
 }
 .header-link,
