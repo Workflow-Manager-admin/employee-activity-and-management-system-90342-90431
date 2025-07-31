@@ -134,15 +134,7 @@ function Header() {
             </button>
           </>
         )}
-        {!user && (
-          <button
-            className="header-cta"
-            onClick={() => navigate("/login")}
-            aria-label="Sign in"
-          >
-            Sign In
-          </button>
-        )}
+        {/* Intentionally removed public Sign In/Register button for admin-only onboarding. */}
       </nav>
     </header>
   );
