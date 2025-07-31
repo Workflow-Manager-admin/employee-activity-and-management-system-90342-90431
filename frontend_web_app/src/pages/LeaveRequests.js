@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useUser } from "../contexts/UserContext";
 
 /**
  * PUBLIC_INTERFACE
