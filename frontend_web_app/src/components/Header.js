@@ -5,8 +5,9 @@ import { useUser } from "../contexts/UserContext";
 /**
  * PUBLIC_INTERFACE
  * The main branded header navigation component.
+ * Only supports light mode (no theme/dark mode) and no localization.
  */
-function Header({ theme, toggleTheme }) {
+function Header() {
   const { user, logout } = useUser();
   const navigate = useNavigate();
 
@@ -142,13 +143,6 @@ function Header({ theme, toggleTheme }) {
             Sign In
           </button>
         )}
-        <button
-          className="theme-toggle"
-          onClick={toggleTheme}
-          aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-        >
-          {theme === "light" ? "🌙" : "☀️"}
-        </button>
       </nav>
     </header>
   );

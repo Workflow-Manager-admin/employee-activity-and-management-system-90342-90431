@@ -17,30 +17,20 @@ import CalendarView from "./pages/CalendarView";
 import Login from "./pages/Login";
 import Onboarding from "./pages/Onboarding";
 import HierarchyMgmt from "./pages/HierarchyMgmt";
-import LocalizationSwitcher from "./components/LocalizationSwitcher";
 import { UserProvider, useUser } from "./contexts/UserContext";
 
 /**
  * PUBLIC_INTERFACE
  * Root App component.
- * Handles theme, routing, role-based layouts, and high-level context.
+ * Handles routing, role-based layouts, and high-level context.
+ * All light mode only, no localization or theme switches.
  */
 function App() {
-  const [theme, setTheme] = useState("light");
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]);
-
-  // PUBLIC_INTERFACE
-  const toggleTheme = () =>
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
-
   return (
     <UserProvider>
       <Router>
         <div className="App">
-          <Header theme={theme} toggleTheme={toggleTheme} />
+          <Header />
           <main className="app-main-area">
             <Routes>
               <Route path="/login" element={<Login />} />
@@ -69,7 +59,6 @@ function App() {
             </Routes>
           </main>
           <Footer />
-          <LocalizationSwitcher />
         </div>
       </Router>
     </UserProvider>
