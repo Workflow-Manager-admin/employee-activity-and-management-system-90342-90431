@@ -7,16 +7,18 @@ function AdminPanel() {
   // Nav menu (mobile/hamburger)
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Demo employees
+  // Demo employees (default initially empty, can add sample later for demo)
   const [employees, setEmployees] = useState([
-    { id: 1, empNo: "EMP001", name: "A. Smith", email: "asmith@email.com", role: "Manager", status: "Active" },
-    { id: 2, empNo: "EMP002", name: "B. Jones", email: "bjones@email.com", role: "Employee", status: "Inactive" },
-    { id: 3, empNo: "EMP003", name: "C. Doe", email: "cdoe@email.com", role: "Employee", status: "Active" }
+    // -- to simulate zero state, leave array empty: []
+    // Uncomment lines below to restore demo data:
+    // { id: 1, empNo: "EMP001", name: "A. Smith", email: "asmith@email.com", role: "Manager", status: "Active" },
+    // { id: 2, empNo: "EMP002", name: "B. Jones", email: "bjones@email.com", role: "Employee", status: "Inactive" },
+    // { id: 3, empNo: "EMP003", name: "C. Doe", email: "cdoe@email.com", role: "Employee", status: "Active" }
   ]);
   const [addForm, setAddForm] = useState({ name: "", email: "", role: "Employee", status: "Active" });
   const [adding, setAdding] = useState(false);
 
-  // Metrics (derived)
+  // Metrics (safe for zero-emps)
   const total = employees.length;
   const active = employees.filter(e => e.status === "Active").length;
   const inactive = total - active;
@@ -25,7 +27,7 @@ function AdminPanel() {
   const empRoles = {
     Manager: managers,
     Admin: admins,
-    Employee: total - managers - admins
+    Employee: Math.max(0, total - managers - admins)
   };
 
   // Quick action: add
@@ -154,21 +156,29 @@ function AdminPanel() {
                 </tr>
               </thead>
               <tbody>
-                {employees.map(emp => (
-                  <tr key={emp.id}>
-                    <td>{emp.empNo}</td>
-                    <td>{emp.name}</td>
-                    <td>{emp.email}</td>
-                    <td>{emp.role}</td>
-                    <td>{emp.status}</td>
-                    <td style={{textAlign:"center"}}>
-                      <button className="button-small button-secondary" style={{marginRight:8}} onClick={()=>{
-                        // Could open inline edit drawer here (not demoed)
-                      }}>Edit</button>
-                      <button className="button-small button-pink" onClick={()=>handleDelete(emp.id)}>Delete</button>
+                {employees.length > 0 ? (
+                  employees.map(emp => (
+                    <tr key={emp.id}>
+                      <td>{emp.empNo}</td>
+                      <td>{emp.name}</td>
+                      <td>{emp.email}</td>
+                      <td>{emp.role}</td>
+                      <td>{emp.status}</td>
+                      <td style={{textAlign:"center"}}>
+                        <button className="button-small button-secondary" style={{marginRight:8}} onClick={()=>{
+                          // Could open inline edit drawer here (not demoed)
+                        }}>Edit</button>
+                        <button className="button-small button-pink" onClick={()=>handleDelete(emp.id)}>Delete</button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} style={{textAlign:"center", color:"var(--secondary-purple)", fontWeight: 500, fontSize:"1.08em", padding:"32px 6px"}}>
+                      <span style={{opacity:0.67}}>No employees yet. <span role="img" aria-label="sparkles">✨</span> Use <span style={{color:"var(--accent-yellow)",fontWeight:"bold"}}>Add Employee</span> above or bulk import to get started.</span>
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
