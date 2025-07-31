@@ -7,13 +7,16 @@ function AdminPanel() {
   // Nav menu (mobile/hamburger)
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Demo employees (default initially empty, can add sample later for demo)
+  // Demo employees (start with sample for demonstration/UI visibility)
   const [employees, setEmployees] = useState([
-    // -- to simulate zero state, leave array empty: []
-    // Uncomment lines below to restore demo data:
-    // { id: 1, empNo: "EMP001", name: "A. Smith", email: "asmith@email.com", role: "Manager", status: "Active" },
-    // { id: 2, empNo: "EMP002", name: "B. Jones", email: "bjones@email.com", role: "Employee", status: "Inactive" },
-    // { id: 3, empNo: "EMP003", name: "C. Doe", email: "cdoe@email.com", role: "Employee", status: "Active" }
+    {
+      id: 1,
+      empNo: "EMP001",
+      name: "A. Smith",
+      email: "asmith@email.com",
+      role: "Manager",
+      status: "Active"
+    }
   ]);
   const [addForm, setAddForm] = useState({ name: "", email: "", role: "Employee", status: "Active" });
   const [adding, setAdding] = useState(false);
