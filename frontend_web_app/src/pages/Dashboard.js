@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
-import Navbar from "../components/Navbar";
 
 /**
  * PUBLIC_INTERFACE
@@ -9,8 +8,7 @@ import Navbar from "../components/Navbar";
  * For admin users, displays the module grid as the main dashboard content.
  */
 function Dashboard() {
-  const { user } = useUser();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const { user, logout } = useUser();
   
   if (!user) return <div>Loading…</div>;
 
@@ -85,39 +83,50 @@ function Dashboard() {
         description: "Define and manage reporting structures and roles.",
         icon: "🔗",
         path: "/hierarchy"
+      },
+      {
+        title: "Calendar View",
+        description: "View work logs and leave schedules in calendar format.",
+        icon: "📅",
+        path: "/calendar"
+      },
+      {
+        title: "Notifications",
+        description: "View system notifications and alerts.",
+        icon: "🔔",
+        path: "/notifications"
       }
     ];
 
     return (
-      <div style={{ position: "relative" }}>
-        {/* Mobile-only Navbar - hidden on desktop where sidebar is primary navigation */}
-        <div style={{ display: window.innerWidth <= 768 ? "block" : "none" }}>
-          <Navbar open={menuOpen} onToggle={() => setMenuOpen(m => !m)} onNavigate={() => setMenuOpen(false)} />
-        </div>
+      <div>
+        <h2 style={{
+          marginTop: 0, 
+          marginBottom: 24, 
+          letterSpacing: "0.7px", 
+          fontWeight: 800,
+          color: "var(--primary-blue)", 
+          fontSize: "2rem"
+        }}>Admin Dashboard</h2>
         
-        {/* Main admin dashboard content - always visible and prominent */}
-        <div style={{ 
-          filter: (window.innerWidth <= 768 && menuOpen) ? "blur(2px)" : "none", 
-          pointerEvents: (window.innerWidth <= 768 && menuOpen) ? "none" : "auto", 
-          transition: "filter .2s" 
-        }}>
-          <h2 style={{
-            marginTop: window.innerWidth <= 768 ? 16 : 0, 
-            marginBottom: 24, 
-            letterSpacing: "0.7px", 
-            fontWeight: 800,
-            color: "var(--primary-blue)", 
-            fontSize: "2rem"
-          }}>Admin Dashboard</h2>
+        <div className="admin-grid">
+          {adminModules.map((module, index) => (
+            <Link to={module.path} key={index} className="module-card">
+              <div className="module-card-icon">{module.icon}</div>
+              <div className="module-card-title">{module.title}</div>
+              <div className="module-card-description">{module.description}</div>
+            </Link>
+          ))}
           
-          <div className="admin-grid">
-            {adminModules.map((module, index) => (
-              <Link to={module.path} key={index} className="module-card">
-                <div className="module-card-icon">{module.icon}</div>
-                <div className="module-card-title">{module.title}</div>
-                <div className="module-card-description">{module.description}</div>
-              </Link>
-            ))}
+          {/* Logout module card for admins */}
+          <div 
+            className="module-card" 
+            style={{ cursor: "pointer" }}
+            onClick={logout}
+          >
+            <div className="module-card-icon">🚪</div>
+            <div className="module-card-title">Logout</div>
+            <div className="module-card-description">Sign out of your admin account.</div>
           </div>
         </div>
       </div>

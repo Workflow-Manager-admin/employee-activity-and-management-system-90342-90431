@@ -73,13 +73,24 @@ function App() {
 /**
  * PUBLIC_INTERFACE
  * Require user authentication. Redirects to login if not authenticated.
+ * For admin users, hides sidebar and shows only grid modules.
  */
 function RequireAuth({ children }) {
   const { user } = useUser();
   if (!user) {
     return <Navigate to="/login" replace />;
   }
-  // Render sidebar and children for authenticated users
+  
+  // For admin users, hide sidebar and render only the main content area
+  if (user.role === "admin") {
+    return (
+      <div className="app-content-area" style={{ padding: "40px", maxWidth: "none" }}>
+        {children}
+      </div>
+    );
+  }
+  
+  // For non-admin users, render sidebar and children as before
   return (
     <div className="app-content-with-sidebar">
       <Sidebar />
