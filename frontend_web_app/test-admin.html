@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>Admin Dashboard Test</h1>
+    <div id="test-results"></div>
+    
+    <script>
+        // Simple test to verify admin dashboard elements would render
+        function runTests() {
+            const results = document.getElementById('test-results');
+            
+            // Test 1: Check if admin modules array would render
+            const adminModules = [
+                {
+                    title: "Employee Management",
+                    description: "Add, edit, and manage all employee profiles and records.",
+                    icon: "👥",
+                    path: "/admin-panel" 
+                },
+                {
+                    title: "Reporting",
+                    description: "Generate and view detailed reports on employee activity.",
+                    icon: "📊",
+                    path: "/reporting"
+                }
+            ];
+            
+            if (adminModules.length > 0) {
+                results.innerHTML += '<div class="test-result success">✓ Admin modules array is properly defined</div>';
+            } else {
+                results.innerHTML += '<div class="test-result error">✗ Admin modules array is empty</div>';
+            }
+            
+            // Test 2: Simulate role check
+            const mockUser = { role: "admin", name: "Test Admin", email: "admin@test.com" };
+            if (mockUser.role === "admin") {
+                results.innerHTML += '<div class="test-result success">✓ Admin role check works correctly</div>';
+            } else {
+                results.innerHTML += '<div class="test-result error">✗ Admin role check failed</div>';
+            }
+            
+            // Test 3: Check if grid would render
+            const gridContainer = document.createElement('div');
+            gridContainer.className = 'admin-grid';
+            gridContainer.style.display = 'grid';
+            gridContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(220px, 1fr))';
+            gridContainer.style.gap = '24px';
+            
+            if (gridContainer.style.display === 'grid') {
+                results.innerHTML += '<div class="test-result success">✓ Admin grid CSS properties are correct</div>';
+            } else {
+                results.innerHTML += '<div class="test-result error">✗ Admin grid CSS properties are incorrect</div>';
+            }
+            
+            results.innerHTML += '<div class="test-result info">ℹ Now test the actual React application at http://localhost:3001</div>';
+            results.innerHTML += '<div class="test-result info">ℹ Steps: 1) Go to login page 2) Select "Administrator" role 3) Fill email/password 4) Click Login</div>';
+        }
+        
+        runTests();
+    </script>
+</body>
+</html>

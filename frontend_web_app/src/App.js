@@ -40,26 +40,8 @@ function App() {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/onboarding" element={<Onboarding />} />
-              <Route path="/" element={<RequireAuth />}>
-                <Route index element={<Dashboard />} />
-                <Route path="work-log" element={<WorkLog />} />
-                <Route path="leave-requests" element={<LeaveRequests />} />
-                <Route path="notifications" element={<Notifications />} />
-
-                {/* Manager-only */}
-                <Route path="team-review" element={<ProtectedRoute role="manager"><TeamReview /></ProtectedRoute>} />
-                <Route path="leave-approvals" element={<ProtectedRoute role="manager"><LeaveApprovals /></ProtectedRoute>} />
-
-                {/* Admin-only */}
-                <Route path="admin-panel" element={<ProtectedRoute role="admin"><AdminPanel /></ProtectedRoute>} />
-                <Route path="audit-trail" element={<ProtectedRoute role="admin"><AuditTrail /></ProtectedRoute>} />
-                <Route path="reporting" element={<ProtectedRoute role="admin"><Reporting /></ProtectedRoute>} />
-                <Route path="hierarchy" element={<ProtectedRoute role="admin"><HierarchyMgmt /></ProtectedRoute>} />
-              </Route>
-              {/* Calendar is visible to all roles */}
               <Route path="/calendar" element={<CalendarView />} />
-
-              {/* Catch-all */}
+              <Route path="/*" element={<RequireAuth />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </main>
@@ -75,7 +57,7 @@ function App() {
  * Require user authentication. Redirects to login if not authenticated.
  * For admin users, hides sidebar and shows only grid modules.
  */
-function RequireAuth({ children }) {
+function RequireAuth() {
   const { user } = useUser();
   if (!user) {
     return <Navigate to="/login" replace />;
@@ -85,7 +67,16 @@ function RequireAuth({ children }) {
   if (user.role === "admin") {
     return (
       <div className="app-content-area" style={{ padding: "40px", maxWidth: "none" }}>
-        {children}
+        <Routes>
+          <Route index element={<Dashboard />} />
+          <Route path="work-log" element={<WorkLog />} />
+          <Route path="leave-requests" element={<LeaveRequests />} />
+          <Route path="notifications" element={<Notifications />} />
+          <Route path="admin-panel" element={<ProtectedRoute role="admin"><AdminPanel /></ProtectedRoute>} />
+          <Route path="audit-trail" element={<ProtectedRoute role="admin"><AuditTrail /></ProtectedRoute>} />
+          <Route path="reporting" element={<ProtectedRoute role="admin"><Reporting /></ProtectedRoute>} />
+          <Route path="hierarchy" element={<ProtectedRoute role="admin"><HierarchyMgmt /></ProtectedRoute>} />
+        </Routes>
       </div>
     );
   }
@@ -94,7 +85,16 @@ function RequireAuth({ children }) {
   return (
     <div className="app-content-with-sidebar">
       <Sidebar />
-      <div className="app-content-area">{children}</div>
+      <div className="app-content-area">
+        <Routes>
+          <Route index element={<Dashboard />} />
+          <Route path="work-log" element={<WorkLog />} />
+          <Route path="leave-requests" element={<LeaveRequests />} />
+          <Route path="notifications" element={<Notifications />} />
+          <Route path="team-review" element={<ProtectedRoute role="manager"><TeamReview /></ProtectedRoute>} />
+          <Route path="leave-approvals" element={<ProtectedRoute role="manager"><LeaveApprovals /></ProtectedRoute>} />
+        </Routes>
+      </div>
     </div>
   );
 }
