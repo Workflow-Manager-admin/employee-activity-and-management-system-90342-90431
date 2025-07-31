@@ -13,7 +13,7 @@ function Header() {
 
   return (
     <header className="header-gradient">
-      <div className="header-logo">Employee Activity and Management System</div>
+      <div className="header-logo">TATA ELXSI</div>
       <nav className="header-nav">
         {user && (
           <>

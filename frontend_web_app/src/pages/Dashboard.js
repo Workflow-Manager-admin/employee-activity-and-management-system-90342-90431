@@ -62,7 +62,7 @@ function Dashboard() {
     );
   }
 
-  return <div>Welcome to the Employee Activity and Management System</div>;
+  return <div>Welcome to TATA ELXSI</div>;
 }
 
 export default Dashboard;
