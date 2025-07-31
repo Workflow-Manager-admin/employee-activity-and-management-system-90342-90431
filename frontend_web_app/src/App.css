@@ -40,9 +40,7 @@ main.app-main-area {
 .header-gradient {
   background: linear-gradient(90deg, var(--primary-blue) 0%, var(--secondary-purple) 100%);
   color: var(--text-white);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  /* Remove space-between here, manage flex inside the container */
   padding: 20px 40px;
   height: 72px;
   min-height: 72px;
@@ -50,16 +48,99 @@ main.app-main-area {
   font-weight: bold;
   z-index: 999;
 }
+
+/* FLEX CONTAINER for three regions: logo, nav, right-title */
+.header-flex-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-width: 0;
+  gap: 20px;
+}
+
+/* TATA ELXSI logo, left side */
 .header-logo {
   font-size: 2rem;
   letter-spacing: 0.5px;
   font-weight: 700;
   text-transform: uppercase;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
+
+/* Navigation in the middle, will shrink if needed */
 .header-nav {
   display: flex;
   gap: 32px;
   align-items: center;
+  flex-wrap: wrap;
+  flex: 1 1 auto;
+  justify-content: flex-start;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+/* Right-side text: Employee Management, always right-aligned */
+.header-title-right {
+  font-size: 1.25rem;
+  letter-spacing: 0.25px;
+  font-weight: 600;
+  margin-left: 24px;
+  white-space: nowrap;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Responsive tweaks for header */
+@media (max-width: 900px) {
+  .header-gradient {
+    padding: 18px 12px;
+  }
+  .header-flex-container {
+    gap: 10px;
+  }
+  .header-logo {
+    font-size: 1.25rem;
+  }
+  .header-title-right {
+    font-size: 1rem;
+    margin-left: 8px;
+  }
+  .header-nav {
+    gap: 16px;
+    font-size: 0.93rem;
+  }
+}
+@media (max-width: 600px) {
+  .header-gradient {
+    padding: 10px 5px;
+    min-height: 56px;
+    height: auto;
+  }
+  .header-flex-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+  .header-logo, .header-title-right {
+    text-align: left;
+    font-size: 1rem;
+    margin: 2px 0;
+  }
+  .header-title-right {
+    margin-left: 0;
+    text-align: left;
+    font-weight: 500;
+    white-space: normal;
+  }
+  .header-nav {
+    justify-content: flex-start;
+    gap: 12px;
+    font-size: 0.9rem;
+    margin: 2px 0;
+    flex-wrap: wrap;
+  }
 }
 .header-link,
 .header-link-active {
