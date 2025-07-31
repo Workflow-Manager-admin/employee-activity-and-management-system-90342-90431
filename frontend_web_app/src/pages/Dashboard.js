@@ -90,11 +90,24 @@ function Dashboard() {
 
     return (
       <div style={{ position: "relative" }}>
-        <Navbar open={menuOpen} onToggle={() => setMenuOpen(m => !m)} onNavigate={() => setMenuOpen(false)} />
-        <div style={{ filter: menuOpen ? "blur(2px)" : "none", pointerEvents: menuOpen ? "none" : "auto", transition: "filter .2s" }}>
+        {/* Mobile-only Navbar - hidden on desktop where sidebar is primary navigation */}
+        <div style={{ display: window.innerWidth <= 768 ? "block" : "none" }}>
+          <Navbar open={menuOpen} onToggle={() => setMenuOpen(m => !m)} onNavigate={() => setMenuOpen(false)} />
+        </div>
+        
+        {/* Main admin dashboard content - always visible and prominent */}
+        <div style={{ 
+          filter: (window.innerWidth <= 768 && menuOpen) ? "blur(2px)" : "none", 
+          pointerEvents: (window.innerWidth <= 768 && menuOpen) ? "none" : "auto", 
+          transition: "filter .2s" 
+        }}>
           <h2 style={{
-            marginTop: 32, marginBottom: 24, letterSpacing: "0.7px", fontWeight: 800,
-            color: "var(--primary-blue)", fontSize: "2rem"
+            marginTop: window.innerWidth <= 768 ? 16 : 0, 
+            marginBottom: 24, 
+            letterSpacing: "0.7px", 
+            fontWeight: 800,
+            color: "var(--primary-blue)", 
+            fontSize: "2rem"
           }}>Admin Dashboard</h2>
           
           <div className="admin-grid">

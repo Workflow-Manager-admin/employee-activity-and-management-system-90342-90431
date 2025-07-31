@@ -643,3 +643,25 @@ main.app-main-area {
   flex-direction: column;
   gap: 8px;
 }
+
+/* ---------- Admin Dashboard Layout ---------- */
+.mobile-navbar {
+  display: none; /* Hidden by default on desktop */
+}
+
+.admin-main-content {
+  /* Ensure main content is always visible and prominent */
+  position: relative;
+  z-index: 1;
+}
+
+/* Show mobile navbar only on mobile/tablet screens */
+@media (max-width: 768px) {
+  .mobile-navbar {
+    display: block;
+  }
+  
+  .admin-main-content {
+    margin-top: 16px;
+  }
+}
