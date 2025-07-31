@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
+import { dashboardAPI } from "../services/apiService";
 
 /**
  * PUBLIC_INTERFACE
@@ -9,12 +10,64 @@ import { useUser } from "../contexts/UserContext";
  */
 function Dashboard() {
   const { user, logout } = useUser();
+  const [stats, setStats] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load dashboard statistics
+  useEffect(() => {
+    if (user) {
+      loadDashboardStats();
+    }
+  }, [user]);
+
+  async function loadDashboardStats() {
+    try {
+      setIsLoading(true);
+      let dashboardStats;
+      
+      if (user.role === "admin" || user.role === "Administrator") {
+        dashboardStats = await dashboardAPI.getSystemStats();
+      } else if (user.role === "manager" || user.role === "Manager") {
+        dashboardStats = await dashboardAPI.getTeamStats();
+      } else {
+        dashboardStats = await dashboardAPI.getStats();
+      }
+      
+      setStats(dashboardStats);
+    } catch (error) {
+      console.error('Error loading dashboard stats:', error);
+      // Set default stats if API fails
+      setStats({
+        logsThisMonth: 0,
+        leaveDaysUsed: 0,
+        completionRate: 0,
+        teamProductivity: 0,
+        teamMembers: 0,
+        totalEmployees: 0,
+        systemActivity: 0,
+        activeManagers: 0,
+        pendingRequests: 0,
+        completedTasks: 0
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
   
   if (!user) {
     return (
       <div className="loading-text">
         <div className="loading-spinner"></div>
         Loading your dashboard...
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="loading-text">
+        <div className="loading-spinner"></div>
+        Loading dashboard statistics...
       </div>
     );
   }
@@ -93,7 +146,7 @@ function Dashboard() {
                   color: "var(--success-green)",
                   marginBottom: "8px"
                 }}>
-                  12
+                  {stats?.logsThisMonth || 0}
                 </div>
                 <div style={{ color: "var(--secondary-purple)", fontWeight: "600" }}>
                   Logs This Month
@@ -106,7 +159,7 @@ function Dashboard() {
                   color: "var(--accent-yellow)",
                   marginBottom: "8px"
                 }}>
-                  3
+                  {stats?.leaveDaysUsed || 0}
                 </div>
                 <div style={{ color: "var(--secondary-purple)", fontWeight: "600" }}>
                   Leave Days Used
@@ -119,7 +172,7 @@ function Dashboard() {
                   color: "var(--primary-blue)",
                   marginBottom: "8px"
                 }}>
-                  87%
+                  {stats?.completionRate || 0}%
                 </div>
                 <div style={{ color: "var(--secondary-purple)", fontWeight: "600" }}>
                   Completion Rate
@@ -169,10 +222,10 @@ function Dashboard() {
             </p>
             <div style={{ marginBottom: "16px" }}>
               <div className="status-indicator status-completed" style={{ marginRight: "8px", marginBottom: "8px" }}>
-                5 Completed
+                {stats?.completedTasks || 0} Completed
               </div>
               <div className="status-indicator status-pending">
-                2 Pending
+                {stats?.pendingTasks || 0} Pending
               </div>
             </div>
             <div className="card-actions">
@@ -190,7 +243,7 @@ function Dashboard() {
               Approve or review team leave requests.
             </p>
             <div className="status-indicator status-in-progress" style={{ marginBottom: "16px" }}>
-              3 Awaiting Review
+              {stats?.pendingRequests || 0} Awaiting Review
             </div>
             <div className="card-actions">
               <Link to="/leave-approvals" className="button-secondary" style={{ textDecoration: "none" }}>
@@ -229,7 +282,7 @@ function Dashboard() {
                 color: "var(--success-green)",
                 marginBottom: "8px"
               }}>
-                92%
+                {stats?.teamProductivity || 0}%
               </div>
               <div style={{ color: "var(--secondary-purple)", fontWeight: "600" }}>
                 Team Productivity
@@ -242,7 +295,7 @@ function Dashboard() {
                 color: "var(--accent-yellow)",
                 marginBottom: "8px"
               }}>
-                7
+                {stats?.teamMembers || 0}
               </div>
               <div style={{ color: "var(--secondary-purple)", fontWeight: "600" }}>
                 Team Members
@@ -261,7 +314,7 @@ function Dashboard() {
         description: "Add, edit, and manage all employee profiles and records.",
         icon: "👥",
         path: "/admin-panel",
-        stats: "24 Employees"
+        stats: `${stats?.totalEmployees || 0} Employees`
       },
       {
         title: "Reporting",
@@ -359,7 +412,7 @@ function Dashboard() {
                 backgroundClip: "text",
                 marginBottom: "12px"
               }}>
-                24
+                {stats?.totalEmployees || 0}
               </div>
               <div style={{ 
                 color: "var(--primary-blue)", 
@@ -379,7 +432,7 @@ function Dashboard() {
                 backgroundClip: "text",
                 marginBottom: "12px"
               }}>
-                85%
+                {stats?.systemActivity || 0}%
               </div>
               <div style={{ 
                 color: "var(--primary-blue)", 
@@ -399,7 +452,7 @@ function Dashboard() {
                 backgroundClip: "text",
                 marginBottom: "12px"
               }}>
-                7
+                {stats?.activeManagers || 0}
               </div>
               <div style={{ 
                 color: "var(--primary-blue)", 

@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { calendarAPI } from "../services/apiService";
+import { useUser } from "../contexts/UserContext";
 
 /**
  * PUBLIC_INTERFACE
@@ -6,11 +8,53 @@ import React, { useState } from "react";
  * Visually appealing and expands to fill the content area.
  */
 function CalendarView() {
+  const { user } = useUser();
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [events, setEvents] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
   const monthName = currentDate.toLocaleString("default", { month: "long" });
+
+  // Load calendar events when date changes
+  useEffect(() => {
+    if (user) {
+      loadCalendarEvents();
+    }
+  }, [user, year, month]);
+
+  async function loadCalendarEvents() {
+    try {
+      setIsLoading(true);
+      const calendarData = await calendarAPI.getCalendarEvents(year, month);
+      
+      // Transform API response to events object keyed by day
+      const eventsMap = {};
+      calendarData.forEach(event => {
+        const eventDate = new Date(event.date);
+        const day = eventDate.getDate();
+        
+        if (!eventsMap[day]) {
+          eventsMap[day] = [];
+        }
+        
+        eventsMap[day].push({
+          type: event.type, // 'log' or 'leave'
+          title: event.title || event.description,
+          id: event.id,
+          status: event.status
+        });
+      });
+      
+      setEvents(eventsMap);
+    } catch (error) {
+      console.error('Error loading calendar events:', error);
+      setEvents({});
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   const firstDayOfMonth = new Date(year, month, 1);
   const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -43,14 +87,6 @@ function CalendarView() {
     });
   }
 
-  // Mock events for the current month (June 2024 for demo)
-  const events = {
-    4: [{ type: "log", title: "Project Alpha" }],
-    7: [{ type: "leave", title: "Personal Leave" }],
-    18: [{ type: "log", title: "Design Review" }, { type: 'leave', title: 'Sick' }],
-    23: [{ type: "log", title: "Client Meeting" }],
-  };
-
   const changeMonth = (offset) => {
     setCurrentDate(new Date(year, month + offset, 1));
   };
@@ -66,15 +102,44 @@ function CalendarView() {
   
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+  if (!user) {
+    return (
+      <div className="loading-text">
+        <div className="loading-spinner"></div>
+        Loading calendar...
+      </div>
+    );
+  }
+
   return (
     <div className="calendar-container">
       <div className="calendar-header">
         <h2>{`${monthName} ${year}`}</h2>
         <div className="calendar-nav">
-          <button onClick={() => changeMonth(-1)} aria-label="Previous month">&larr;</button>
-          <button onClick={() => changeMonth(1)} aria-label="Next month">&rarr;</button>
+          <button 
+            onClick={() => changeMonth(-1)} 
+            aria-label="Previous month"
+            disabled={isLoading}
+          >
+            &larr;
+          </button>
+          <button 
+            onClick={() => changeMonth(1)} 
+            aria-label="Next month"
+            disabled={isLoading}
+          >
+            &rarr;
+          </button>
         </div>
       </div>
+      
+      {isLoading && (
+        <div style={{ textAlign: "center", padding: "20px" }}>
+          <div className="loading-spinner"></div>
+          <div style={{ marginTop: "10px" }}>Loading calendar events...</div>
+        </div>
+      )}
+      
       <div className="calendar-grid">
         {dayNames.map(name => <div key={name} className="calendar-day-name">{name}</div>)}
         {calendarDays.map(({ day, isOtherMonth }, index) => {

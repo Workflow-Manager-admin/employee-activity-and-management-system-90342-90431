@@ -330,5 +330,77 @@ export const notificationAPI = {
   }
 };
 
+// PUBLIC_INTERFACE
+// Dashboard and Analytics API methods
+export const dashboardAPI = {
+  /**
+   * Get dashboard statistics for current user
+   * @returns {Promise} API response with user-specific stats
+   */
+  getStats: async () => {
+    const response = await apiClient.get('/dashboard/stats');
+    return response.data;
+  },
+
+  /**
+   * Get team statistics (for managers)
+   * @returns {Promise} API response with team stats
+   */
+  getTeamStats: async () => {
+    const response = await apiClient.get('/dashboard/team-stats');
+    return response.data;
+  },
+
+  /**
+   * Get system statistics (for admins)
+   * @returns {Promise} API response with system-wide stats
+   */
+  getSystemStats: async () => {
+    const response = await apiClient.get('/dashboard/system-stats');
+    return response.data;
+  }
+};
+
+// PUBLIC_INTERFACE
+// Audit Trail API methods (Admin only)
+export const auditAPI = {
+  /**
+   * Get audit trail entries
+   * @param {Object} params - Query parameters (limit, offset, etc.)
+   * @returns {Promise} API response with audit entries
+   */
+  getAuditTrail: async (params = {}) => {
+    const response = await apiClient.get('/audit-trail', { params });
+    return response.data;
+  }
+};
+
+// PUBLIC_INTERFACE
+// Calendar API methods
+export const calendarAPI = {
+  /**
+   * Get calendar events for a specific month
+   * @param {number} year - Year
+   * @param {number} month - Month (0-11)
+   * @returns {Promise} API response with calendar events
+   */
+  getCalendarEvents: async (year, month) => {
+    const response = await apiClient.get('/calendar/events', {
+      params: { year, month }
+    });
+    return response.data;
+  },
+
+  /**
+   * Get current user's calendar events
+   * @param {Object} params - Date range parameters
+   * @returns {Promise} API response with user's events
+   */
+  getUserEvents: async (params = {}) => {
+    const response = await apiClient.get('/calendar/user-events', { params });
+    return response.data;
+  }
+};
+
 // Export the configured axios instance for custom requests
 export default apiClient;

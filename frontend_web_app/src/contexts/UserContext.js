@@ -39,17 +39,21 @@ export function UserProvider({ children }) {
   // PUBLIC_INTERFACE
   async function login(credentials) {
     try {
-      // For demo purposes, we'll simulate API login
-      // In production, this would call authAPI.login(credentials)
+      // Call real API for authentication
+      const response = await authAPI.login(credentials);
+      
       const userObj = {
-        name: credentials.email.split("@")[0] || "Demo User",
-        email: credentials.email,
-        role: credentials.role
+        id: response.user.id,
+        name: response.user.name,
+        email: response.user.email,
+        role: response.user.role,
+        empNo: response.user.empNo,
+        department: response.user.department,
+        designation: response.user.designation
       };
       
       setUser(userObj);
       localStorage.setItem('currentUser', JSON.stringify(userObj));
-      localStorage.setItem('authToken', 'demo-token-' + Date.now());
       
       return userObj;
     } catch (error) {
@@ -61,12 +65,17 @@ export function UserProvider({ children }) {
   // PUBLIC_INTERFACE
   async function logout() {
     try {
-      // In production, would call authAPI.logout()
+      // Call real API for logout
+      await authAPI.logout();
       setUser(null);
       localStorage.removeItem('currentUser');
       localStorage.removeItem('authToken');
     } catch (error) {
       console.error('Logout error:', error);
+      // Even if API call fails, clear local state
+      setUser(null);
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('authToken');
     }
   }
 
