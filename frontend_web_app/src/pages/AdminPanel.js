@@ -24,15 +24,26 @@ function AdminPanel() {
   ];
   const [activeTab, setActiveTab] = useState("overview");
 
-  // Dummy employee data
+  // Dummy employee data with unique employee number (auto increment for demo)
   const [employees, setEmployees] = useState([
-    { id: 1, name: "A. Smith", email: "asmith@email.com", role: "Manager", status: "Active", manager: "" },
-    { id: 2, name: "C. Doe", email: "cdoe@email.com", role: "Employee", status: "Active", manager: "A. Smith" },
-    { id: 3, name: "B. Jones", email: "bjones@email.com", role: "Employee", status: "Inactive", manager: "A. Smith" },
+    { id: 1, empNo: "EMP001", name: "A. Smith", email: "asmith@email.com", role: "Manager", status: "Active", manager: "" },
+    { id: 2, empNo: "EMP002", name: "C. Doe", email: "cdoe@email.com", role: "Employee", status: "Active", manager: "A. Smith" },
+    { id: 3, empNo: "EMP003", name: "B. Jones", email: "bjones@email.com", role: "Employee", status: "Inactive", manager: "A. Smith" },
   ]);
   const [showAddEdit, setShowAddEdit] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
-  const [pendingEmp, setPendingEmp] = useState({ name: "", email: "", role: "Employee", status: "Active", manager: "" });
+  // Pending emp stores the form fields, including auto employee number readonly (generated on modal open)
+  const [pendingEmp, setPendingEmp] = useState({ empNo: "", name: "", email: "", role: "Employee", status: "Active", manager: "" });
+
+  // Util to auto-generate the next employee number (auto-increment, not UUID for demo)
+  function getNextEmployeeNumber() {
+    // Get max numeric part of empNo, increment by 1
+    const lastNo = employees
+      .map(e => parseInt((e.empNo || '').replace("EMP","")) || 0)
+      .reduce((a, b) => Math.max(a, b), 0);
+    const next = (lastNo + 1).toString().padStart(3,'0');
+    return `EMP${next}`;
+  }
 
   // Bulk import dummy result
   const [importResult, setImportResult] = useState(null);
@@ -85,16 +96,26 @@ function AdminPanel() {
   }
 
   // Employee CRUD handlers
+  // PUBLIC_INTERFACE
   function handleAddEditEmployee() {
     if (editTarget) {
-      // Edit
-      setEmployees(employees.map(e => (e.id === editTarget.id ? { ...editTarget, ...pendingEmp } : e)));
+      // Edit: keep empNo & id, update others
+      setEmployees(employees.map(e =>
+        e.id === editTarget.id ? { ...e, ...pendingEmp } : e
+      ));
     } else {
-      // Add
-      setEmployees([...employees, { ...pendingEmp, id: Date.now() }]);
+      // Add: generate empNo and id
+      setEmployees([
+        ...employees,
+        {
+          ...pendingEmp,
+          empNo: getNextEmployeeNumber(),
+          id: Date.now() // use ms timestamp for id in demo
+        }
+      ]);
     }
     setShowAddEdit(false);
-    setPendingEmp({ name: "", email: "", role: "Employee", status: "Active", manager: "" });
+    setPendingEmp({ empNo: "", name: "", email: "", role: "Employee", status: "Active", manager: "" });
     setEditTarget(null);
   }
   function handleDeleteEmployee(id) {
@@ -103,7 +124,14 @@ function AdminPanel() {
   function handleEditClicked(emp) {
     setShowAddEdit(true);
     setEditTarget(emp);
-    setPendingEmp({ name: emp.name, email: emp.email, role: emp.role, status: emp.status, manager: emp.manager || "" });
+    setPendingEmp({
+      empNo: emp.empNo || "",
+      name: emp.name,
+      email: emp.email,
+      role: emp.role,
+      status: emp.status,
+      manager: emp.manager || ""
+    });
   }
   // Tab rendering
   function renderMainPanel() {
@@ -142,19 +170,39 @@ function AdminPanel() {
           <div className="card">
             <div className="card-title" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <span>Manage Employees</span>
-              <button className="button-primary" onClick={() => { setShowAddEdit(true); setEditTarget(null); setPendingEmp({ name: "", email: "", role: "Employee", status: "Active", manager: "" }); }}>
+              <button
+                className="button-primary"
+                onClick={() => {
+                  setShowAddEdit(true);
+                  setEditTarget(null);
+                  setPendingEmp({
+                    empNo: getNextEmployeeNumber(),
+                    name: "",
+                    email: "",
+                    role: "Employee",
+                    status: "Active",
+                    manager: ""
+                  });
+                }}>
                 Add Employee
               </button>
             </div>
             <table className="table" style={{ marginTop: "20px" }}>
               <thead>
                 <tr>
-                  <th>Name</th><th>Email</th><th>Role</th><th>Manager</th><th>Status</th><th>Action</th>
+                  <th>EMP No</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Manager</th>
+                  <th>Status</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
                 {employees.map(emp => (
                   <tr key={emp.id}>
+                    <td>{emp.empNo}</td>
                     <td>{emp.name}</td>
                     <td>{emp.email}</td>
                     <td>{emp.role}</td>
@@ -183,6 +231,22 @@ function AdminPanel() {
                   </div>
                   <div className="card-title">{editTarget ? "Edit Employee" : "Add Employee"}</div>
                   <form onSubmit={e => { e.preventDefault(); handleAddEditEmployee(); }}>
+                    <div style={{marginBottom:12}}>
+                      <label style={{fontSize:".99em",fontWeight:"bold",color:"var(--secondary-purple)",marginRight:8}}>EMP No</label>
+                      <input
+                        className="input"
+                        type="text"
+                        value={
+                          editTarget
+                            ? pendingEmp.empNo
+                            : (pendingEmp.empNo || getNextEmployeeNumber())
+                        }
+                        disabled
+                        style={{ background: "#f3f3f8", color: "var(--primary-blue)", fontWeight: 700, letterSpacing: 1.8, marginBottom: 7 }}
+                        tabIndex={-1}
+                        readOnly
+                      />
+                    </div>
                     <input
                       className="input"
                       type="text"

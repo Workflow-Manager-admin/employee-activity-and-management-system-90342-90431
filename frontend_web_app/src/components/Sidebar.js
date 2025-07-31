@@ -116,7 +116,35 @@ function Sidebar() {
       >
         Notifications
       </NavLink>
+      {/* Logout option always last and prominent in sidebar for admin and other roles */}
+      <LogoutSidebarButton />
     </aside>
+  );
+}
+
+/** LogoutSidebarButton - context aware render, button only for authenticated users. */
+function LogoutSidebarButton() {
+  const { user, logout } = useUser() || {};
+  if (!user) return null;
+  return (
+    <button
+      className="button-secondary"
+      onClick={logout}
+      style={{
+        width: "80%",
+        margin: "2em 10% 0 10%",
+        display: "block",
+        background: "var(--accent-yellow)",
+        color: "var(--text-white)",
+        fontWeight: "bold",
+        borderRadius: 8,
+        fontSize: "1.04rem",
+        border: "none"
+      }}
+      tabIndex={0}
+    >
+      Logout
+    </button>
   );
 }
 
