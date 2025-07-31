@@ -63,6 +63,58 @@ function Onboarding() {
         <input className="input" type="file" accept=".csv" style={{ maxWidth: 260 }} />
         <button className="button-secondary" style={{ marginLeft: "16px", minWidth: 140 }}>Import CSV</button>
       </div>
+      {/* CSV Import instructions/info box for admins */}
+      <div
+        style={{
+          background: "var(--light-bg)",
+          border: "1.5px solid var(--border-color, #e9ecef)",
+          borderRadius: 10,
+          marginTop: 18,
+          padding: "18px 22px",
+          color: "var(--primary-blue)",
+          fontSize: ".99em",
+          boxShadow: "0 2px 16px rgba(37,72,138,0.05)",
+          maxWidth: 640
+        }}
+        aria-live="polite"
+      >
+        <div style={{fontWeight: 700, marginBottom: 3, fontSize: "1.03em"}}>
+          <span style={{color:"var(--accent-yellow)"}}>ℹ️</span> CSV Import Format Instructions:
+        </div>
+        <ul style={{paddingLeft:20, margin: "7px 0 4px 0"}}>
+          <li>
+            The <span style={{fontWeight:600}}>first row must be a header</span> with the following columns (order required):
+          </li>
+        </ul>
+        <div style={{ fontFamily: "monospace, monospace", background: "#f8f8f8", borderRadius: 6, padding: "10px 14px", margin: "7px 0" }}>
+          employee_number, name, email, department, designation, role, joining_date, phone, address, dob, gender, manager, location
+        </div>
+        <ul style={{paddingLeft:20,marginBottom:6}}>
+          <li>All fields are <b>mandatory</b> except <i>address</i>. Use <b>YYYY-MM-DD</b> for <b>joining_date</b> and <b>dob</b>.</li>
+          <li><b>employee_number</b>: Unique for each employee (e.g., <i>EMP000183</i>).</li>
+          <li><b>role</b>: Must be one of <span style={{ fontFamily: "monospace", fontWeight: 600 }}>Employee</span>, <span style={{ fontFamily: "monospace", fontWeight: 600 }}>Manager</span>, or <span style={{ fontFamily: "monospace", fontWeight: 600 }}>Admin</span>.</li>
+          <li><b>gender</b>: Acceptable values: Male, Female, Other, Prefer not to say.</li>
+          <li>Manager can be name or email (must match as existing or new entry).</li>
+        </ul>
+        <div style={{marginTop:10}}>
+          <span style={{fontWeight:600, color:"var(--secondary-purple)"}}>Sample row:</span>
+          <pre
+            style={{
+              background: "#fffbe3",
+              border: "1px solid #f5c400",
+              borderRadius: 6,
+              fontFamily: "monospace",
+              fontSize: "0.98em",
+              margin: "7px 0 0 0",
+              padding: "10px 14px",
+              overflowX: "auto"
+            }}
+          >{`EMP000183, Alex Lee, alex.lee@email.com, Engineering, Software Engineer, Employee, 2024-04-12, 9123456789, "Bangalore, India", 1997-08-21, Male, B. Jones, Bangalore`}</pre>
+        </div>
+        <div style={{marginTop:8, lineHeight:"1.5", color:"var(--accent-pink)", fontWeight:600}}>
+          ⚠️ Ensure there are no blank header or missing fields in any row. Use comma separation only; do not use Excel formulas or merged cells. Save as UTF-8 encoded CSV.
+        </div>
+      </div>
       <div style={{ marginTop: "40px", display: "flex", flexDirection: "column", alignItems: "center" }}>
         <button
           className="button-primary"
