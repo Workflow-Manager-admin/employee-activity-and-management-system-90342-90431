@@ -63,6 +63,18 @@ export function UserProvider({ children }) {
   }
 
   // PUBLIC_INTERFACE
+  async function register(userData) {
+    try {
+      // Call real API for registration
+      const response = await authAPI.register(userData);
+      return response;
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw error;
+    }
+  }
+
+  // PUBLIC_INTERFACE
   async function logout() {
     try {
       // Call real API for logout
@@ -80,7 +92,7 @@ export function UserProvider({ children }) {
   }
 
   return (
-    <UserContext.Provider value={{ user, setUser, login, logout, isLoading }}>
+    <UserContext.Provider value={{ user, setUser, login, register, logout, isLoading }}>
       {children}
     </UserContext.Provider>
   );

@@ -32,9 +32,6 @@ function SignInForm() {
       setIsLoading(false);
     }
   }
-=======
-
-
 
   return (
     <div className="signin-form-container">
@@ -89,8 +86,6 @@ function SignInForm() {
               disabled={isLoading}
             />
           </div>
-
-
 
           {/* Login Button */}
           <button 

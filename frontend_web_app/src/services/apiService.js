@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // PUBLIC_INTERFACE
 // API service configuration with environment variable support
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3000';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://vscode-internal-28888-beta.beta01.cloud.kavia.ai/proxy/8000/';
 const API_TIMEOUT = parseInt(process.env.REACT_APP_API_TIMEOUT) || 10000;
 
 // Create axios instance with default configuration
