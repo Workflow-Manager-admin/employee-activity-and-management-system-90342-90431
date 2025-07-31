@@ -63,18 +63,8 @@ function Navbar({ open, onToggle, onNavigate }) {
           Admin Menu
         </div>
       </div>
-      {/* Dropdown sidebar-style panel */}
       {open && (
-        <div style={{
-          background: "var(--light-bg, #f5f6fb)",
-          borderRight: "2px solid var(--border-color, #e9ecef)",
-          padding: "17px 0",
-          minWidth: 180,
-          boxShadow: "2px 0 18px rgba(37,72,138,0.08)",
-          position: "absolute",
-          top: 56,
-          left: 0,
-        }}>
+        <div className="admin-navbar-dropdown">
           <NavLink
             to="/"
             className={({ isActive }) => isActive ? "sidebar-link-active" : "sidebar-link"}
