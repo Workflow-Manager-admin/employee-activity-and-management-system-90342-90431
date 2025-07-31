@@ -11,7 +11,7 @@ function Header() {
   const { user, logout } = useUser();
   const navigate = useNavigate();
 
-  // Visually center "TATA ELXSI" (left) and "Employee Management" (right) within banner
+  // Visually center "TATA ELXSI" (left) and (conditionally) "Employee Management" (right)
   return (
     <header className="header-gradient">
       <div className="header-align-center">
@@ -138,9 +138,12 @@ function Header() {
           )}
           {/* Intentionally removed public Sign In/Register button for admin-only onboarding. */}
         </nav>
-        <div className="header-title-right">
-          Employee Management
-        </div>
+        {/* Show "Employee Management" only when NOT logged in */}
+        {!user && (
+          <div className="header-title-right">
+            Employee Management
+          </div>
+        )}
       </div>
     </header>
   );
