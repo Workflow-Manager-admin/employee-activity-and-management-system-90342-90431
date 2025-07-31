@@ -18,6 +18,7 @@ import Login from "./pages/Login";
 import Onboarding from "./pages/Onboarding";
 import HierarchyMgmt from "./pages/HierarchyMgmt";
 import { UserProvider, useUser } from "./contexts/UserContext";
+import { Helmet } from "react-helmet";
 
 /**
  * PUBLIC_INTERFACE
@@ -29,6 +30,10 @@ function App() {
   return (
     <UserProvider>
       <Router>
+        <Helmet>
+          <title>TATA ELXSI</title>
+          <meta name="description" content="TATA ELXSI – Unified platform for employee activity tracking, reporting, leave, dashboards, and management." />
+        </Helmet>
         <div className="App">
           <Header />
           <main className="app-main-area">
