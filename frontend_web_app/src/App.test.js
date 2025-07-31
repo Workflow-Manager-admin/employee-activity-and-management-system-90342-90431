@@ -1,8 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+// PUBLIC_INTERFACE
+// TATA ELXSI: Test for brand presence on the main screen.
+test('renders TATA ELXSI brand in header', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  const headerElement = screen.getByText(/TATA ELXSI/i);
+  expect(headerElement).toBeInTheDocument();
 });
