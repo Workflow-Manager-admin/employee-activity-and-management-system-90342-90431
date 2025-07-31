@@ -44,7 +44,15 @@ function Onboarding() {
   }
 
   return (
-    <div className="card" style={{ maxWidth: 760, margin: "0 auto", padding: "40px 36px" }}>
+    <div
+      className="card"
+      style={{
+        maxWidth: 760,
+        margin: "0 auto",
+        padding: "40px 8vw 40px 8vw",
+        boxSizing: "border-box"
+      }}
+    >
       <div className="card-title" style={{ fontSize: "1.45rem" }}>Bulk Onboarding</div>
       {flash.msg && (
         <div className={`notification ${flash.type}`} style={{ marginBottom: 18, textAlign: "center" }}>
