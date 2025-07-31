@@ -62,7 +62,7 @@ function Dashboard() {
     );
   }
 
-  return <div>Welcome to the Employee Activity & Management System</div>;
+  return <div>Welcome to the Employee Activity and Management System</div>;
 }
 
 export default Dashboard;

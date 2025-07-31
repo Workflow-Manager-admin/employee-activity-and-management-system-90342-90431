@@ -12,7 +12,7 @@ function Header({ theme, toggleTheme }) {
 
   return (
     <header className="header-gradient">
-      <div className="header-logo">EAMS</div>
+      <div className="header-logo">Employee Activity and Management System</div>
       <nav className="header-nav">
         {user && (
           <>

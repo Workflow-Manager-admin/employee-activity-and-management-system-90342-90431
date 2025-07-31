@@ -64,6 +64,7 @@ function Login() {
         }}>
           Demo: Select a role above to sign in as different user type.
         </div>
+        {/* Removed language selection dropdown from login page as per requirements */}
       </div>
     </div>
   );
